@@ -223,8 +223,13 @@ module OmniAuth
       @env['omniauth.origin'] = session.delete('omniauth.origin')
       @env['omniauth.origin'] = nil if env['omniauth.origin'] == ''
       @env['omniauth.params'] = session.delete('omniauth.params') || {}
-      OmniAuth.config.before_callback_phase.call(@env) if OmniAuth.config.before_callback_phase
+      if OmniAuth.config.before_callback_phase
+        log :info, %Q{auth0: #{self.class.name}.callback_call: dispatching before_callback_phase}
+        OmniAuth.config.before_callback_phase.call(@env)
+      end
+      log :info, %Q{auth0: #{self.class.name}.callback_call: callback start}
       callback_phase
+      log :info, %Q{auth0: #{self.class.name}.callback_call: callback finish}
     end
 
     # Returns true if the environment recognizes either the
