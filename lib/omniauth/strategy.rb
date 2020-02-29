@@ -228,8 +228,9 @@ module OmniAuth
         OmniAuth.config.before_callback_phase.call(@env)
       end
       log :info, %Q{auth0: #{self.class.name}.callback_call: callback start}
-      callback_phase
+      result = callback_phase
       log :info, %Q{auth0: #{self.class.name}.callback_call: callback finish}
+      return result
     end
 
     # Returns true if the environment recognizes either the
