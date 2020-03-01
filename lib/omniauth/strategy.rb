@@ -224,12 +224,12 @@ module OmniAuth
       @env['omniauth.origin'] = nil if env['omniauth.origin'] == ''
       @env['omniauth.params'] = session.delete('omniauth.params') || {}
       if OmniAuth.config.before_callback_phase
-        log :info, %Q{auth0: #{self.class.name}.callback_call: dispatching before_callback_phase}
+        log :info, %Q{auth0: #{self.class.name}.callback_call: OMNIAUTH dispatching before_callback_phase}
         OmniAuth.config.before_callback_phase.call(@env)
       end
-      log :info, %Q{auth0: #{self.class.name}.callback_call: callback start}
+      log :info, %Q{auth0: #{self.class.name}.callback_call: OMNIAUTH callback start}
       result = callback_phase
-      log :info, %Q{auth0: #{self.class.name}.callback_call: callback finish}
+      log :info, %Q{auth0: #{self.class.name}.callback_call: OMNIAUTH callback finish}
       return result
     end
 
