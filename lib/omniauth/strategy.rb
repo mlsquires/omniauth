@@ -183,7 +183,9 @@ module OmniAuth
       return request_call if on_request_path? && OmniAuth.config.allowed_request_methods.include?(request.request_method.downcase.to_sym)
       return callback_call if on_callback_path?
       return other_phase if respond_to?(:other_phase)
+      Rails.logger.info %Q{auth0: #{self.class.name}.call!: start}
       @app.call(env)
+      Rails.logger.info %Q{auth0: #{self.class.name}.call!: finish}
     end
 
     # Responds to an OPTIONS request.
@@ -263,6 +265,7 @@ module OmniAuth
     # in the event that OmniAuth has been configured to be
     # in test mode.
     def mock_call!(*)
+      Rails.logger.info %Q{auth0: #{self.class.name}.mock_call}
       return mock_request_call if on_request_path?
       return mock_callback_call if on_callback_path?
       call_app!
@@ -283,6 +286,7 @@ module OmniAuth
     end
 
     def mock_callback_call
+      Rails.logger.info %Q{auth0: #{self.class.name}.mock_callback_call}
       setup_phase
       @env['omniauth.origin'] = session.delete('omniauth.origin')
       @env['omniauth.origin'] = nil if env['omniauth.origin'] == ''
