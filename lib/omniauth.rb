@@ -84,7 +84,6 @@ module OmniAuth
 
     def add_mock(provider, original = {})
       # Create key-stringified new hash from given auth hash
-      Rails.logger.info %Q{auth0: #{self.class.name}.add_mock( #{provider}}
       mock = {}
       original.each_pair do |key, val|
         mock[key.to_s] = if val.is_a? Hash
@@ -129,7 +128,6 @@ module OmniAuth
   end
 
   def self.mock_auth_for(provider)
-      Rails.logger.info %Q{auth0: #{self.class.name}.mock_auth_for( #{provider}}
     config.mock_auth[provider.to_sym] || config.mock_auth[:default]
   end
 
