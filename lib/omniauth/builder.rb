@@ -60,7 +60,7 @@ module OmniAuth
     end
 
     def call(env)
-      Rails.logger.info %Q{auth0: #{self.class.name}.call: start}
+      Rails.logger.info %Q{auth0: #{self.class.name}.call( env )}
       result = to_app.call(env)
       Rails.logger.info %Q{auth0: #{self.class.name}.call: finish}
       return result

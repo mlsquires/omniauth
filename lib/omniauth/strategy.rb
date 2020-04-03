@@ -170,6 +170,7 @@ module OmniAuth
     #
     # @param env [Hash] The Rack environment.
     def call!(env) # rubocop:disable CyclomaticComplexity, PerceivedComplexity
+      Rails.logger.info %Q{auth0: #{self.class.name}.call!( env )}
       unless env['rack.session']
         error = OmniAuth::NoSessionError.new('You must provide a session to use OmniAuth.')
         raise(error)
@@ -183,9 +184,9 @@ module OmniAuth
       return request_call if on_request_path? && OmniAuth.config.allowed_request_methods.include?(request.request_method.downcase.to_sym)
       return callback_call if on_callback_path?
       return other_phase if respond_to?(:other_phase)
-      Rails.logger.info %Q{auth0: #{self.class.name}.call!: start}
-      @app.call(env)
+      result = @app.call(env)
       Rails.logger.info %Q{auth0: #{self.class.name}.call!: finish}
+      return result
     end
 
     # Responds to an OPTIONS request.
