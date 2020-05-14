@@ -198,11 +198,15 @@ module OmniAuth
 
     # Performs the steps necessary to run the request phase of a strategy.
     def request_call # rubocop:disable CyclomaticComplexity, MethodLength, PerceivedComplexity
+      Rails.logger.info %Q{auth0: #{self.class.name}.request_call: enter}
       setup_phase
       log :info, 'Request phase initiated.'
       # store query params from the request url, extracted in the callback_phase
       session['omniauth.params'] = request.GET
       OmniAuth.config.before_request_phase.call(env) if OmniAuth.config.before_request_phase
+
+      rack_session_omniauth_origin = nil
+
       if options.form.respond_to?(:call)
         log :info, 'Rendering form from supplied Rack endpoint.'
         options.form.call(env)
@@ -212,8 +216,16 @@ module OmniAuth
       else
         if request.params['origin']
           env['rack.session']['omniauth.origin'] = request.params['origin']
+          rack_session_omniauth_origin = env['rack.session']['omniauth.origin']
+          Rails.logger.info %Q{auth0: #{self.class.name}.request_call: request.params['origin']: #{rack_session_omniauth_origin.inspect}}
         elsif env['HTTP_REFERER'] && !env['HTTP_REFERER'].match(/#{request_path}$/)
           env['rack.session']['omniauth.origin'] = env['HTTP_REFERER']
+          rack_session_omniauth_origin = env['rack.session']['omniauth.origin']
+          Rails.logger.info %Q{auth0: #{self.class.name}.request_call: HTTP_REFERER: #{rack_session_omniauth_origin.inspect}}
+        end
+        if rack_session_omniauth_origin.nil?
+          rack_session_omniauth_origin = env['rack.session']['omniauth.origin']
+          Rails.logger.info %Q{auth0: #{self.class.name}.request_call: omniauth_origin not set: #{rack_session_omniauth_origin.inspect}}
         end
         request_phase
       end
@@ -223,6 +235,8 @@ module OmniAuth
     def callback_call
       setup_phase
       log :info, 'Callback phase initiated.'
+      Rails.logger.info %Q{auth0: #{self.class.name}.callback_call: omniauth.origin: #{session['omniauth.origin']}}
+      Rails.logger.info %Q{auth0: #{self.class.name}.callback_call: omniauth.params: #{session['omniauth.params']}}
       @env['omniauth.origin'] = session.delete('omniauth.origin')
       @env['omniauth.origin'] = nil if env['omniauth.origin'] == ''
       @env['omniauth.params'] = session.delete('omniauth.params') || {}
